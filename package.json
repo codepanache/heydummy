@@ -4,6 +4,7 @@
   "description": "Hey dummy bot",
   "main": "bot.js",
   "author": "Rohit Kumar",
+  "scripts" : { "start" : "node bot.js"},
   "dependencies": {
     "node": "^8.10.0",
     "npm": "3.5.2",
