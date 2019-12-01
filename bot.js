@@ -1,5 +1,6 @@
 var Discord = require('discord.js');
 var bot = new Discord.Client();
+var mongo = require('mongoose');
 
 'use strict';
 
