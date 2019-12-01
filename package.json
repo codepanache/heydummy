@@ -6,8 +6,6 @@
   "author": "Rohit Kumar",
   "scripts" : { "start" : "node bot.js"},
   "dependencies": {
-    "node": "^8.10.0",
-    "npm": "3.5.2",
     "cheerio": "^1.0.0-rc.3",
     "discord.io": "^2.5.3",
     "discord.js": "^11.5.1",
