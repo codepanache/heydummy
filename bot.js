@@ -1,3 +1,11 @@
+/***
+ * Author: Rohit Kumar(DevOps Engineer)
+ * 
+ */
+
+
+
+
 var Discord = require('discord.js');
 var bot = new Discord.Client();
 var mysql = require('mysql');
