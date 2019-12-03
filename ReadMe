@@ -1,6 +1,8 @@
 #####ReadMe document for the bot 'heydummy' ######
 
 This repository contains the code which implements the full functionality of the Discord bot assignment given in the BlueStack developer challenge.
+The bot was initially hosted on heroku hence the Procfile in the root directory. Currently it is hosted on AWS.
+
 The bot says hi to your hey.
 It shows top 5 results of the google searches when you type !google <your_search_item>.
 
