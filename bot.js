@@ -1,11 +1,17 @@
 var Discord = require('discord.js');
 var bot = new Discord.Client();
-var mongo = require('mongoose');
-
-'use strict';
-
+var mysql = require('mysql');
 var config = require('./config');
 require('dotenv').config();
+
+var con = mysql.createConnection({
+  host: config.DB_HOST,
+  user: config.DB_USER,
+  password: config.DB_PASSWORD,
+  database: config.DB_NAME
+});
+
+'use strict';
 
 bot.on('ready', () =>{
     console.log("the bot is online !");
@@ -20,6 +26,8 @@ const customsearch = google.customsearch('v1');
 searcharray = [];
 //store the resulting links
 resultsarray =[];
+itemscount = 0;
+linkscount = 0;
 
 bot.on('message',function(message){
     //reply hi to hey 
@@ -36,9 +44,15 @@ bot.on('message',function(message){
          if (args[0] === 'google'){
             query = args.join(' ');
             query = query.replace("google","");
-            //final query will contain the term we would like to search for
-            searcharray.push(query);
-            console.log(searcharray);
+            
+            con.query("select count(*) as rows from searcharray", function(err,result){
+                if (err) throw err;
+                itemscount = result[0].rows;
+                con.query("insert into searcharray(keynumber,keywords) values(?,?)",[itemscount+1,query],function(err,data){
+                    if(err) throw err;
+                    console.log("inserted one row in searcharray table!");
+                });
+            });
             //use google customsearch.cse.list function to list the search results after the query, uses google api key to authenticate and 
             // also the custom search engine id
             customsearch.cse.list({
@@ -54,18 +68,27 @@ bot.on('message',function(message){
                     var l = resp.data.items.length;
         console.log('Total number of results: ' + l); // this is always 10
         linksarray = [];
+
+        con.query("select count(*) as rows from linksarray", function(err,result){
+            if (err) throw err;
+            linkscount = result[0].rows;
+        
+        counter = 0;
         for(var i=0; i<l; i++){
             //console.log(resp.data.items[i]);
+            counter = counter + 1 ;
+            con.query("insert into linksarray(linkno,link) values(?,?)",[linkscount+counter,resp.data.items[i].link],function(err,data){
+                if(err) throw err;
+                console.log("inserted one row in linksarray table!");
+            })
             linksarray.push(resp.data.items[i].link);
             console.log('Result Number ' + (i+1) + ': ', linksarray[i]);
+            if (i < 5){
+                message.reply(linksarray[i]);
+            }
 
         }
-        resultsarray.push(linksarray);
-        console.log(resultsarray);
-        for(var i=0; i<5; i++){
-            message.reply(linksarray[i]);
-
-        }
+    });
                 }
             });
             
@@ -74,16 +97,22 @@ bot.on('message',function(message){
         //logic for !recent game
 
         if (args[0] === 'recent'){
-            result = args.join(' ');
-            result = result.replace("recent","");
-            console.log(result);
-            for (var i = searcharray.length-1; i >= 0 ; i--){
-                //console.log(searcharray[i]);
-                if (searcharray[i].includes(result)){
-                    //console.log(searcharray[i]);
-                    message.reply(searcharray[i]);
-                }
+            kword = args.join(' ');
+            kword = kword.replace("recent","");
+            console.log(kword);
+            resultcount = 0;
+            var sql1 = "select count(*) as rows from searcharray where keywords like concat('%',?,'%')";
+            con.query(sql1,kword, function (err, result) {
+                if (err) throw err;
+                resultcount = result[0].rows;
+            });
+            var sql2 = "select * from searcharray where keywords like concat('%',?,'%')";
+            con.query(sql2,kword, function (err, result) {
+                if (err) throw err;
+            for (var i = resultcount-1; i >=0 ; i--){
+                    message.reply(result[i].keywords);
             }
+        });
         }
          })
 
