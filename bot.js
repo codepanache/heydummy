@@ -41,7 +41,7 @@ linkscount = 0;
 bot.on('message',function(message){
     //reply hi to hey 
          if (message.content === 'hey'){
-             message.reply('hi');
+             message.reply('hello');
          }
 
          //separate prefix ! from the search string
